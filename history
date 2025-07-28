@@ -1,0 +1,129 @@
+import React, { useState, useEffect } from "react";
+import { ShipmentOptimization } from "@/entities/ShipmentOptimization";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { 
+  History as HistoryIcon, 
+  Search, 
+  FileDown,
+  MoreVertical
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { format } from "date-fns";
+
+export default function History() {
+  const [optimizations, setOptimizations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    loadOptimizations();
+  }, []);
+
+  const loadOptimizations = async () => {
+    try {
+      const data = await ShipmentOptimization.list("-created_date");
+      setOptimizations(data);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filteredOptimizations = optimizations.filter(opt =>
+    opt.product_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800">Optimization History</h1>
+          <p className="text-slate-500 mt-1">Review and export all past optimizations.</p>
+        </div>
+        <Button><FileDown className="w-4 h-4 mr-2" />Export All</Button>
+      </div>
+
+      <Card className="bg-white shadow-sm">
+        <CardHeader>
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input 
+                placeholder="Search by product name..." 
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            {/* Future filter button can go here */}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Product</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Cost Saved</TableHead>
+                <TableHead>CO₂ Saved</TableHead>
+                <TableHead>Volume Saved</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                Array(5).fill(0).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell colSpan={7} className="text-center py-4">Loading...</TableCell>
+                  </TableRow>
+                ))
+              ) : filteredOptimizations.length === 0 ? (
+                 <TableRow>
+                    <TableCell colSpan={7} className="text-center py-10">
+                      <p className="font-semibold">No results found</p>
+                      <p className="text-slate-500 text-sm">Try adjusting your search or filters.</p>
+                    </TableCell>
+                  </TableRow>
+              ) : (
+                filteredOptimizations.map(opt => (
+                  <TableRow key={opt.id}>
+                    <TableCell className="font-medium">{opt.product_name}</TableCell>
+                    <TableCell>{format(new Date(opt.created_date), "MMM dd, yyyy")}</TableCell>
+                    <TableCell className="text-green-600 font-semibold">${(opt.savings?.cost || 0).toFixed(2)}</TableCell>
+                    <TableCell>{(opt.savings?.co2 || 0).toFixed(2)} kg</TableCell>
+                    <TableCell>{(opt.savings?.volume || 0).toFixed(0)} cm³</TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 capitalize">{opt.status}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                       <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>View Details</DropdownMenuItem>
+                          <DropdownMenuItem>Download Report</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
