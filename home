@@ -1,0 +1,143 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { createPageUrl } from '@/utils';
+import { motion } from 'framer-motion';
+import { 
+  ArrowRight, 
+  Box, 
+  DollarSign, 
+  Leaf, 
+  BarChart, 
+  CheckCircle,
+  Cpu,
+  PackageCheck
+} from 'lucide-react';
+
+const FeatureCard = ({ icon, title, children }) => (
+  <motion.div 
+    className="bg-white p-6 rounded-xl shadow-sm border border-slate-100"
+    whileHover={{ scale: 1.05, shadow: "0px 10px 20px rgba(0, 0, 0, 0.05)" }}
+  >
+    <div className="flex items-center gap-4">
+      <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg flex items-center justify-center">
+        {React.createElement(icon, { className: "w-6 h-6 text-green-600" })}
+      </div>
+      <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
+    </div>
+    <p className="mt-4 text-slate-600">
+      {children}
+    </p>
+  </motion.div>
+);
+
+export default function HomePage() {
+  return (
+    <div className="bg-slate-50 text-slate-900">
+      {/* Hero Section */}
+      <motion.section 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        className="text-center py-20 px-4"
+      >
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+            Ship Smarter, Not Harder.
+          </h1>
+          <p className="mt-6 text-xl text-slate-600 max-w-2xl mx-auto">
+            EcoOpti is the AI-powered platform that optimizes your shipping packaging to cut costs, reduce waste, and boost your brand's sustainability.
+          </p>
+          <div className="mt-10">
+            <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-lg h-14 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+              <Link to={createPageUrl('Optimizer')}>
+                Start Optimizing Now <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-slate-800">The Future of Sustainable Logistics</h2>
+            <p className="mt-4 text-lg text-slate-500">Everything you need to ship efficiently and responsibly.</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <FeatureCard icon={Cpu} title="AI-Powered Optimization">
+              Our smart algorithm calculates the most efficient box size and packing materials for any order in seconds.
+            </FeatureCard>
+            <FeatureCard icon={DollarSign} title="Instant Cost Savings">
+              Reduce dimensional weight and material expenses. On average, our clients save 15-30% on shipping costs.
+            </FeatureCard>
+            <FeatureCard icon={Leaf} title="Effortless ESG Reporting">
+              Automatically track your carbon footprint reduction and generate shareable ESG reports to impress stakeholders.
+            </FeatureCard>
+            <FeatureCard icon={Box} title="3D Package Visualization">
+              See your optimized package before you pack it. Eliminate empty space and ensure product safety.
+            </FeatureCard>
+             <FeatureCard icon={PackageCheck} title="Improved Customer Experience">
+              Delight customers with right-sized packaging, reducing "box-in-a-box" frustration and waste.
+            </FeatureCard>
+            <FeatureCard icon={BarChart} title="Actionable Analytics">
+              Our dashboard visualizes your savings and environmental impact over time, turning data into strategy.
+            </FeatureCard>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+       <section className="py-20">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-800">Three Simple Steps to Efficiency</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-10 text-center">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+              <div className="w-20 h-20 bg-white border-2 border-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl font-bold text-green-600">1</span>
+              </div>
+              <h3 className="text-xl font-semibold">Enter Product Details</h3>
+              <p className="text-slate-600 mt-2">Input the dimensions and weight of the products in your shipment.</p>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+              <div className="w-20 h-20 bg-white border-2 border-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl font-bold text-green-600">2</span>
+              </div>
+              <h3 className="text-xl font-semibold">Run Optimization</h3>
+              <p className="text-slate-600 mt-2">Our AI analyzes millions of combinations to find the perfect fit.</p>
+            </motion.div>
+             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+              <div className="w-20 h-20 bg-white border-2 border-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl font-bold text-green-600">3</span>
+              </div>
+              <h3 className="text-xl font-semibold">View & Save</h3>
+              <p className="text-slate-600 mt-2">Get instant results showing your savings in cost, volume, and CO₂.</p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="bg-white py-20">
+        <div className="max-w-4xl mx-auto text-center px-4">
+          <h2 className="text-4xl font-bold text-slate-800">
+            Ready to Revolutionize Your Shipping?
+          </h2>
+          <p className="mt-4 text-lg text-slate-600">
+            Join the leading brands who are saving money and the planet with every package they send.
+          </p>
+          <div className="mt-8">
+             <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-lg h-14 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+              <Link to={createPageUrl('Optimizer')}>
+                Get Started for Free <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
