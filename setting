@@ -1,0 +1,52 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+
+export default function SettingsPage() {
+  return (
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-800">Settings</h1>
+        <p className="text-slate-500 mt-1">Manage your workspace and account settings.</p>
+      </div>
+
+      <Card className="bg-white shadow-sm">
+        <CardHeader>
+          <CardTitle>Workspace Settings</CardTitle>
+          <CardDescription>Update your workspace name and preferences.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="workspaceName">Workspace Name</Label>
+            <Input id="workspaceName" defaultValue="Acme Inc." />
+          </div>
+        </CardContent>
+        <CardContent className="border-t pt-6">
+          <Button>Save Changes</Button>
+        </CardContent>
+      </Card>
+      
+      <Card className="bg-white shadow-sm">
+        <CardHeader>
+          <CardTitle>My Profile</CardTitle>
+          <CardDescription>Update your personal information.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+           <div className="space-y-2">
+            <Label htmlFor="fullName">Full Name</Label>
+            <Input id="fullName" defaultValue="John Doe" />
+          </div>
+           <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" defaultValue="john.doe@acme.com" disabled />
+          </div>
+        </CardContent>
+         <CardContent className="border-t pt-6">
+          <Button>Update Profile</Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
