@@ -1,0 +1,163 @@
+import React, { useState, useEffect } from "react";
+import { ShipmentOptimization } from "@/entities/ShipmentOptimization";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  BarChart3, 
+  TrendingUp, 
+  DollarSign, 
+  Leaf, 
+  Package,
+  Recycle
+} from "lucide-react";
+import { motion } from "framer-motion";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
+
+import ESGMetrics from "../components/dashboard/ESGMetrics";
+import SavingsChart from "../components/dashboard/SavingsChart";
+
+export default function Dashboard() {
+  const [optimizations, setOptimizations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadOptimizations();
+  }, []);
+
+  const loadOptimizations = async () => {
+    try {
+      const data = await ShipmentOptimization.list("-created_date", 50); // Fetch more for calcs
+      setOptimizations(data);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const totalSavings = optimizations.reduce((acc, opt) => ({
+    cost: acc.cost + (opt.savings?.cost || 0),
+    co2: acc.co2 + (opt.savings?.co2 || 0),
+    plastic: acc.plastic + (opt.savings?.plastic || 0),
+    volume: acc.volume + (opt.savings?.volume || 0)
+  }), { cost: 0, co2: 0, plastic: 0, volume: 0 });
+
+  const metricsCards = [
+    {
+      title: "Total Cost Savings",
+      value: `$${totalSavings.cost.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+      icon: DollarSign,
+      color: "text-green-600",
+      bgColor: "bg-green-100",
+      trend: "+12.5% this month"
+    },
+    {
+      title: "CO₂ Reduced",
+      value: `${totalSavings.co2.toFixed(1)} kg`,
+      icon: Leaf,
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-100",
+      trend: "Equivalent to 15 trees"
+    },
+    {
+      title: "Plastic Eliminated",
+      value: `${totalSavings.plastic.toFixed(1)} kg`,
+      icon: Recycle,
+      color: "text-sky-600",
+      bgColor: "bg-sky-100",
+      trend: "85% less packaging waste"
+    },
+    {
+      title: "Optimized Shipments",
+      value: optimizations.length.toString(),
+      icon: Package,
+      color: "text-slate-600",
+      bgColor: "bg-slate-200",
+      trend: `${optimizations.filter(o => new Date(o.created_date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length} this week`
+    }
+  ];
+
+  return (
+    <div className="space-y-6">
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <h1 className="text-3xl font-bold text-slate-800">Dashboard</h1>
+        <p className="text-slate-500 mt-1">Welcome back! Here's your workspace overview.</p>
+      </motion.div>
+
+      {/* Metrics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {metricsCards.map((metric, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+          >
+            <Card className="bg-white shadow-sm hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold text-slate-500 text-sm">
+                    {metric.title}
+                  </h3>
+                   <div className={`p-2 rounded-lg ${metric.bgColor}`}>
+                    <metric.icon className={`w-5 h-5 ${metric.color}`} />
+                  </div>
+                </div>
+                <div className="text-3xl font-bold text-slate-800 mb-2">
+                  {metric.value}
+                </div>
+                <div className="flex items-center text-xs text-slate-500">
+                  <TrendingUp className="w-4 h-4 mr-1 text-green-500" />
+                  <span>{metric.trend}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="grid lg:grid-cols-5 gap-6">
+        <div className="lg:col-span-3">
+          <SavingsChart optimizations={optimizations} />
+        </div>
+        <div className="lg:col-span-2">
+          <ESGMetrics totalSavings={totalSavings} />
+        </div>
+      </div>
+      
+      <Card className="bg-white shadow-sm">
+        <CardHeader>
+          <CardTitle>Recent Optimizations</CardTitle>
+        </CardHeader>
+        <CardContent>
+           <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Product</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Cost Saved</TableHead>
+                <TableHead>CO₂ Saved</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {optimizations.slice(0, 5).map(opt => (
+                <TableRow key={opt.id}>
+                  <TableCell className="font-medium">{opt.product_name}</TableCell>
+                  <TableCell>{format(new Date(opt.created_date), "MMM dd, yyyy")}</TableCell>
+                  <TableCell className="text-green-600 font-semibold">${(opt.savings?.cost || 0).toFixed(2)}</TableCell>
+                  <TableCell>{(opt.savings?.co2 || 0).toFixed(2)} kg</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">Analyzed</Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
